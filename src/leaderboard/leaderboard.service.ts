@@ -12,7 +12,14 @@ export class LeaderboardService {
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   async createRecord({ name, point }: RecordDto): Promise<void> {
-    await this.redis.zadd(LEADERBOARD_ZSET_KEY, point, name);
+    const maxTime = new Date(8.64e15).getTime();
+    const currentTime = Date.now();
+
+    await this.redis.zadd(
+      LEADERBOARD_ZSET_KEY,
+      `${point}.${maxTime - currentTime}`,
+      name,
+    );
   }
 
   async getTop100Leaderboard(): Promise<LeaderboardDto> {
