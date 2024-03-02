@@ -8,8 +8,8 @@ export class LeaderboardController {
   constructor(private readonly leaderboardService: LeaderboardService) {}
 
   @Post('/createRecord')
-  createRecord(@Body() { name, point }: RecordDto): Promise<void> {
-    return this.leaderboardService.createRecord({ name, point });
+  createRecord(@Body() recordDto: RecordDto): Promise<void> {
+    return this.leaderboardService.createRecord(recordDto);
   }
 
   @Get('/')

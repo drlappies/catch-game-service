@@ -3,7 +3,7 @@ import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { RecordDto } from './dtos/record.dto';
 import { LeaderboardDto } from './dtos/leaderboard.dto';
-import * as _ from 'lodash';
+import { chunk } from 'lodash';
 
 const LEADERBOARD_ZSET_KEY = 'leaderboard';
 
@@ -11,13 +11,13 @@ const LEADERBOARD_ZSET_KEY = 'leaderboard';
 export class LeaderboardService {
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
-  async createRecord({ name, point }: RecordDto): Promise<void> {
+  async createRecord({ name, score }: RecordDto): Promise<void> {
     const maxTime = new Date(8.64e15).getTime();
     const currentTime = Date.now();
 
     await this.redis.zadd(
       LEADERBOARD_ZSET_KEY,
-      `${point}.${maxTime - currentTime}`,
+      `${score}.${maxTime - currentTime}`,
       name,
     );
   }
@@ -30,9 +30,9 @@ export class LeaderboardService {
       'WITHSCORES',
     );
 
-    const recordDtos: RecordDto[] = _.chunk(response, 2).map(
+    const recordDtos: RecordDto[] = chunk(response, 2).map(
       ([member, score]) =>
-        new RecordDto({ name: member, point: parseInt(score) }),
+        new RecordDto({ name: member, score: parseInt(score) }),
     );
 
     return new LeaderboardDto({ data: recordDtos });

@@ -7,7 +7,7 @@ export class RecordDto {
   name: string;
 
   @IsInt()
-  point: number;
+  score: number;
 
   constructor(recordDto: Partial<RecordDto>) {
     Object.assign(this, recordDto);
